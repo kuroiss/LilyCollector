@@ -1,0 +1,63 @@
+html
+{
+    margin: 30px;
+    padding : 20px;
+    background-color: rgb(220, 255, 220);
+    font-family: "Noto Sans Light";
+    font-weight: lighter;
+}
+
+body
+{
+    padding: 20px;
+    background-color: honeydew;
+    border-radius: 20px;
+    box-shadow: 5px 5px 10px -7px rgba(0, 0, 0, 0.2);
+}
+
+table
+{
+    border: 0;
+    cellpadding: 2;
+    cellspacing: 2;
+}
+
+button
+{
+    width: 250px;
+    height: 30px;
+    font-size: larger;
+}
+
+select
+{
+    width: 300px;
+    height: 30px;
+    font-size: larger;
+}
+
+input
+{
+    margin: 5px;
+    width: 200;
+    height: 20px;
+    font-size: middle;
+}
+
+h1
+{
+    padding: 10px;
+    margin-bottom: 0px;
+    /* background-color: rgb(255, 218, 211); */
+    border-radius: 10px;
+}
+
+h2
+{
+    padding: 10px;
+    margin-top: 0px;
+    /* background-color: rgb(255, 218, 211); */
+    border-radius: 10px;
+    border-bottom: dashed 2px gray;
+}
+

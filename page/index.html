@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link href="style.css" rel="stylesheet" type="text/css" media="all">
+        <script>
+        </script>
+    </head>
+
+    <body>
+        <h1>百合コンテンツ 集積所</h1>
+        <h2>ログイン</h2>
+        <table>
+            <tr>
+                <td align="left">ID : </td>
+                <td align="left"><input type="text" value="" id="UserID" ></td>
+            </tr>
+            <tr>
+                <td align="left">パスワード : </td>
+                <td align="left"><input type="password" value="" id="Password" ></td>
+            </tr>
+        </table>
+        <button type="submit" name="RequestAuth" onclick="PostUserAuth();">Login</button>
+        <script>
+            function PostUserAuth()
+            {
+                window.location.assign("/private/index.html");
+            }
+        </script></br>
+        <!-- <text id="CompletedAuth" hidden="true">認証成功!</text></br>
+        <text id="FailedAuth" hidden="true">認証失敗…</text></br> -->
+    </body>
+</html>
