@@ -67,13 +67,9 @@ app.post('/line_webhook', function (req, res) {
         var is_upload = 0;
         split_lf_message.forEach((element) => 
         {
-            if(element.indexOf("http") == 0)
+            if(element.indexOf("https://") == 0)
             {
                 url = element;
-            }
-    
-            if(element.includes("upload"))
-            {
                 is_upload = 1;
             }
         });
