@@ -9,7 +9,7 @@ var app = express();
 const port = process.env.PORT || 24345;
 const dir_public = "./page";
 const dir_private = "./private";
-const save_dir = "/LilyDB/";
+const save_dir = "./LilyDB/";
 const save_file = "DB.csv";
 
 app.use("/public", express.static(dir_public));
@@ -22,7 +22,7 @@ app.use(express.urlencoded({extended : true}));
 var crypto = require("crypto");
 function ValidateSignature(signature, body)
 {
-    const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET;
+    const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || "hoge";
 
     return signature == crypto.createHmac("sha256", LINE_CHANNEL_SECRET)
     .update(Buffer.from(JSON.stringify(body)))
@@ -81,8 +81,11 @@ app.post('/line_webhook', function (req, res) {
 // ##### define DB csv download IF
 app.get("/DB_download", (req, res)=>
 {
-    res.download("." + save_dir + save_file);
+    res.download(save_dir + save_file);
 });
 
 
-app.listen(port);
+app.listen(port, (req, res)=>
+{
+    console.log("start listen");
+});
