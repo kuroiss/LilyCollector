@@ -11,6 +11,7 @@ const dir_public = "./page";
 const dir_private = "./private";
 const save_dir = "./LilyDB/";
 const save_file = "DB.csv";
+const save_path = save_dir + save_file;
 
 app.use("/public", express.static(dir_public));
 app.use("/private", express.static(dir_private));
@@ -29,6 +30,30 @@ function ValidateSignature(signature, body)
     .digest("base64");
 }
 
+function ValidateAndMakeDirectory(path)
+{
+    if(!fs.existsSync(path))
+    {
+        fs.mkdir(path, (err) =>
+        {
+            if(err) throw err;
+
+            console.log("Made directory : " + path);
+        });
+    }
+}
+
+function ValidateAndMakeFile(path)
+{
+    if(!fs.existsSync(path))
+    {
+        fs.writeFile(path, "", (err) => 
+        {
+            if(err) throw err;
+        });
+    }
+}
+
 app.post('/line_webhook', function (req, res) {
     var answer_str = "OK.";
 
@@ -40,7 +65,6 @@ app.post('/line_webhook', function (req, res) {
         
         var url = "";
         var is_upload = 0;
-        var count = 0;
         split_lf_message.forEach((element) => 
         {
             if(element.indexOf("http") == 0)
@@ -52,14 +76,16 @@ app.post('/line_webhook', function (req, res) {
             {
                 is_upload = 1;
             }
-    
-            count++;
         });
     
         if(is_upload == 1)
         {
             console.log("recv message, and save.");
-            fs.appendFile(save_dir + save_file, url + "\n", (err) =>
+
+            ValidateAndMakeDirectory(save_dir);
+            ValidateAndMakeFile(save_path);
+
+            fs.appendFile(save_path, url + "\n", (err) =>
             {
                 if(err) throw err;
     
@@ -81,7 +107,7 @@ app.post('/line_webhook', function (req, res) {
 // ##### define DB csv download IF
 app.get("/DB_download", (req, res)=>
 {
-    res.download(save_dir + save_file);
+    res.download(save_path);
 });
 
 
