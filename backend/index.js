@@ -7,17 +7,18 @@ var app = express();
 
 // const vers section
 const port = process.env.PORT || 24345;
-const dir_public = "./page";
-const dir_private = "./private";
-const save_dir = "./LilyDB/";
-const save_file = "DB.csv";
-const save_path = save_dir + save_file;
-
-app.use("/public", express.static(dir_public));
-app.use("/private", express.static(dir_private));
 
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
+
+
+// ##### front page
+const _build_dir_path = path.join(__dirname, "../frontend/build");
+app.use(express.static(_build_dir_path));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(_build_dir_path, "index.html"));
+});
+
 
 // ##### receive webhook event from LINE
 var crypto = require("crypto");
@@ -54,7 +55,10 @@ function ValidateAndMakeFile(path)
     }
 }
 
-app.post('/line_webhook', function (req, res) {
+const save_dir = "./LilyDB/";
+const save_file = "DB.csv";
+const save_path = save_dir + save_file;
+app.post("/line_webhook", function (req, res) {
     var answer_str = "OK.";
 
     if(ValidateSignature(req.headers["x-line-signature"], req.body))
@@ -62,7 +66,7 @@ app.post('/line_webhook', function (req, res) {
         const recv_message = req.body.events[0].message.text;
 
         const split_lf_message = recv_message.split("\n");
-        
+
         var url = "";
         var is_upload = 0;
         split_lf_message.forEach((element) => 
@@ -73,7 +77,7 @@ app.post('/line_webhook', function (req, res) {
                 is_upload = 1;
             }
         });
-    
+
         if(is_upload == 1)
         {
             console.log("recv message, and save.");
@@ -84,7 +88,6 @@ app.post('/line_webhook', function (req, res) {
             fs.appendFile(save_path, url + "\n", (err) =>
             {
                 if(err) throw err;
-    
                 console.log("received message is written on " + save_dir + save_file);
             });
         }
@@ -104,6 +107,10 @@ app.post('/line_webhook', function (req, res) {
 app.get("/DB_download", (req, res)=>
 {
     res.download(save_path);
+});
+
+app.get("/get_lily_list", (req, res) => {
+    
 });
 
 

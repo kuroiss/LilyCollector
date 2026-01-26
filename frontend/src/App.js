@@ -1,4 +1,4 @@
-import UrlGrid from './component/UrlList/UrlGrid';
+import UrlGrid from './component/UrlGrid/UrlGrid';
 import './App.css';
 
 function App() {
