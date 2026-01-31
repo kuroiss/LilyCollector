@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { isMobile } from 'react-device-detect';
 import './UrlGrid.css';
 import { URL_DATA } from '../common/UrlData';
 import getLilyList from '../common/API/GetLilyList';
@@ -11,7 +12,7 @@ const UrlGridApp = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = lilyList.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(URL_DATA.length / itemsPerPage);
+  const totalPages = Math.ceil(lilyList.length / itemsPerPage);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);

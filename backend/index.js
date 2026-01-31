@@ -3,6 +3,13 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
+const {
+    createTable,
+    insertData,
+    selectAllData,
+    deleteData
+} = require("./common/OperateDB");
+
 var app = express();
 
 // const vers section
@@ -24,7 +31,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(_build_dir_path, "index.html"));
 });
 
-
 // ##### receive webhook event from LINE
 var crypto = require("crypto");
 function ValidateSignature(signature, body)
@@ -34,36 +40,9 @@ function ValidateSignature(signature, body)
     return signature == crypto.createHmac("sha256", LINE_CHANNEL_SECRET)
     .update(Buffer.from(JSON.stringify(body)))
     .digest("base64");
-}
+};
 
-function ValidateAndMakeDirectory(path)
-{
-    if(!fs.existsSync(path))
-    {
-        fs.mkdir(path, (err) =>
-        {
-            if(err) throw err;
-
-            console.log("Made directory : " + path);
-        });
-    }
-}
-
-function ValidateAndMakeFile(path)
-{
-    if(!fs.existsSync(path))
-    {
-        fs.writeFile(path, "", (err) => 
-        {
-            if(err) throw err;
-        });
-    }
-}
-
-const save_dir = "./LilyDB/";
-const save_file = "DB.csv";
-const save_path = save_dir + save_file;
-app.post("/line_webhook", function (req, res) {
+app.post("/line_webhook", async (req, res) => {
     var answer_str = "OK.";
 
     if(ValidateSignature(req.headers["x-line-signature"], req.body))
@@ -73,28 +52,22 @@ app.post("/line_webhook", function (req, res) {
         const split_lf_message = recv_message.split("\n");
 
         var url = "";
-        var is_upload = 0;
+        var is_upload = false;
         split_lf_message.forEach((element) =>
         {
             if(element.indexOf("https://") == 0)
             {
                 url = element;
-                is_upload = 1;
+                is_upload = true;
             }
         });
 
-        if(is_upload == 1)
+        if(is_upload)
         {
             console.log("recv message, and save.");
 
-            ValidateAndMakeDirectory(save_dir);
-            ValidateAndMakeFile(save_path);
-
-            fs.appendFile(save_path, url + "\n", (err) =>
-            {
-                if(err) throw err;
-                console.log("received message is written on " + save_dir + save_file);
-            });
+            await createTable();
+            await insertData(url);
         }
         else
         {
@@ -108,35 +81,19 @@ app.post("/line_webhook", function (req, res) {
     res.end(answer_str);
 });
 
-// ##### define DB csv download IF
-app.get("/DB_download", (req, res)=>
-{
-    res.download(save_path);
-});
-
-// データ取得、データ提供
-const URL_LIST = [
-    "https://x.com/shiki_820/status/2014732338283086127?s=20",
-    "https://x.com/suzuo_all/status/2014955312202318278?s=12",
-    "https://x.com/anime_kimishinu/status/2014669469373870206?s=53",
-    "https://www.youtube.com/watch?si=q3e_HY1LMOks7O8f&v=OUeO0rIjZKo&feature=youtu.be",
-    "https://x.com/elhongo14/status/2013032820717801824?s=46",
-    "https://x.com/zenma_trang/status/2013457533705580578?s=46",
-    "https://t.co/3DP0BXoPzj",
-    "https://t.co/eGZF4rzrdz",
-    "https://x.com/basane158/status/2013386488017203676?s=12",
-    "https://x.com/gkmas_official/status/2013159495548191123?s=12",
-]
-
-const URL_DATA = Array.from({length: URL_LIST.length}, (_, i) => ({
-    id: i + 1,
-    url: URL_LIST[i],
-    title: `Contents ${i + 1}`,
-}));
-
-app.get("/api/get_lily_list", (req, res) => {
-    console.log("URL_DATA : ", URL_DATA);
-    res.json(URL_DATA);
+app.get("/api/get_lily_list", async (req, res) => {
+    const lily_contents = await selectAllData();
+    const lily_list = [];
+    lily_contents.map((value) => {
+        lily_list.push(
+            {
+                id: value.id,
+                url: value.url,
+                title: `Contents ${value.id}`
+            }
+        );
+    });
+    res.json(lily_list);
 });
 
 app.listen(port, (req, res)=>
