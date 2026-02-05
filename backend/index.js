@@ -55,9 +55,11 @@ app.post("/line_webhook", async (req, res) => {
         var is_upload = false;
         split_lf_message.forEach((element) =>
         {
-            if(element.indexOf("https://") == 0)
+            const match = element.match(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+)/);
+
+            if(match)
             {
-                url = element;
+                url = match[0];
                 is_upload = true;
             }
         });
