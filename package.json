@@ -1,0 +1,8 @@
+{
+    "name": "LilyCollector",
+    "scripts": {
+      "install:all": "npm install --prefix frontend && npm install --prefix backend",
+      "build:front": "npm run build --prefix frontend",
+      "start": "node backend/index.js"
+    }
+}
