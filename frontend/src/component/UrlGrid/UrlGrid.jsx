@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { isMobile } from 'react-device-detect';
-import { Tweet, EmbeddedTweet, TweetNotFound } from 'react-tweet';
-import { getTweet } from 'react-tweet/api';
+import { Tweet } from 'react-tweet';
 import './UrlGrid.css';
 import getLilyList from '../common/API/GetLilyList';
 
