@@ -1,12 +1,12 @@
 // import / require section
-const http = require("http");
 const path = require("path");
-const fs = require("fs");
+const axios = require("axios");
 const express = require("express");
 const {
     createTable,
     insertData,
     selectAllData,
+    selectRandomData,
     deleteData
 } = require("./common/OperateDB");
 
@@ -24,6 +24,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// constants
+const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || "hoge";
+const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN || "fuga";
+
 // ##### front page
 const _build_dir_path = path.join(__dirname, "../frontend/build");
 app.use(express.static(_build_dir_path));
@@ -35,8 +39,6 @@ app.get('/', (req, res) => {
 var crypto = require("crypto");
 function ValidateSignature(signature, body)
 {
-    const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || "hoge";
-
     return signature == crypto.createHmac("sha256", LINE_CHANNEL_SECRET)
     .update(Buffer.from(JSON.stringify(body)))
     .digest("base64");
@@ -53,6 +55,7 @@ app.post("/line_webhook", async (req, res) => {
 
         var url = "";
         var is_upload = false;
+        var is_random_request = false;
         split_lf_message.forEach((element) =>
         {
             const match = element.match(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+)/);
@@ -62,6 +65,11 @@ app.post("/line_webhook", async (req, res) => {
                 url = match[0];
                 is_upload = true;
             }
+
+            if(element.includes("GETRandomLilyContents"))
+            {
+                is_random_request = true;
+            }
         });
 
         if(is_upload)
@@ -70,6 +78,10 @@ app.post("/line_webhook", async (req, res) => {
 
             await createTable();
             await insertData(url);
+        }
+        else if(is_random_request)
+        {
+            await replyRandomLilyContents(req.body.events[0].replyToken);
         }
         else
         {
@@ -82,6 +94,38 @@ app.post("/line_webhook", async (req, res) => {
     }
     res.end(answer_str);
 });
+
+// GETRandomLilyContentsが投稿された時の処理
+const replyRandomLilyContents = async (reply_token) => {
+    if(!reply_token) return null;
+
+    const reply_api = "https://api.line.me/v2/bot/message/push"
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+    };
+
+    const lily = await selectRandomData();
+    const body = {
+        replyToken: reply_token,
+        messages: [
+            {
+                type: "text",
+                text: lily.url
+            }
+        ]
+    };
+
+    try
+    {
+        await axios.post(reply_api, body, { headers });
+        console.log("recv message, and reply random lily contents.");
+    }
+    catch(err)
+    {
+        console.log("replyRandomLilyContents caused error : ", err);
+    }
+}
 
 app.get("/api/get_lily_list", async (req, res) => {
     const lily_contents = await selectAllData();

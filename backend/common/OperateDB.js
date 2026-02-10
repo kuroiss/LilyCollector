@@ -55,6 +55,7 @@ const insertData = async (url) => {
 };
 
 // SELECT
+// 全取得
 const selectAllData = async () => {
     const query = `SELECT * FROM ${TABLE_NAME} ORDER BY id DESC;`;
     try {
@@ -62,6 +63,21 @@ const selectAllData = async () => {
         return res.rows;
     } catch (err) {
         console.error('Error selecting data:', err);
+    }
+};
+
+// 一つランダムに取得
+const selectRandomData = async () => {
+    try
+    {
+        const query = `SELECT * FROM ${TABLE_NAME} ORDER BY RANDOM() LIMIT 1`;
+
+        const res = await pool.query(query);
+        return res.rows[0];
+    }
+    catch(err)
+    {
+        console.error(`Error executing selectRandomData : ${err}`);
     }
 };
 
@@ -80,6 +96,7 @@ module.exports = {
     createTable,
     insertData,
     selectAllData,
+    selectRandomData,
     deleteData
 };
 
