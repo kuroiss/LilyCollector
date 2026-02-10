@@ -99,7 +99,7 @@ app.post("/line_webhook", async (req, res) => {
 const replyRandomLilyContents = async (reply_token) => {
     if(!reply_token) return null;
 
-    const reply_api = "https://api.line.me/v2/bot/message/push"
+    const reply_api = "https://api.line.me/v2/bot/message/reply"
     const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
@@ -123,7 +123,7 @@ const replyRandomLilyContents = async (reply_token) => {
     }
     catch(err)
     {
-        console.log("replyRandomLilyContents caused error : ", err);
+        console.log("replyRandomLilyContents caused error : ", err.status);
     }
 }
 
