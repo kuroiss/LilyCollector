@@ -18,6 +18,13 @@
   margin-bottom: 40px;
 }
 
+@media (max-width: 600px){
+  .url-grid
+  {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 各URLカードのスタイル */
 .url-card {
   display: flex;
