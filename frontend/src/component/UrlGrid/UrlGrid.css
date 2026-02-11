@@ -2,6 +2,7 @@
 .url-app-container {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   background-color: #555;
+  width: 100vw;
 }
 
 .url-app-title {
@@ -109,7 +110,7 @@
 
 .tweet-frame{
   display: flex;
-  width: 100%;
+  width: 100vw;
   height: 100%;
   flex-direction: column;
   align-items: center;
@@ -119,7 +120,7 @@
 
 .youtube-frame{
   display: flex;
-  width: 100%;
+  width: 100vw;
   aspect-ratio: 16 /9;
   flex-direction: column;
   align-items: center;
